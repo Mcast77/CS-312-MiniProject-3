@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Update Post</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <%- include("header.ejs") %>
+    <h1 class="center">Update Post</h1>
+    <form action="/uploadUpdate" method="post" class="formLayout">
+      <input
+        type="hidden"
+        id="blog_id"
+        name="blog_id"
+        value="<%=blogPost.blog_id%>"
+      />
+      <label for="title">Blog Title: </label><br />
+      <input
+        type="input"
+        id="title"
+        name="title"
+        class="extend"
+        value="<%=blogPost.title%>"
+      /><br />
+      <label for="body">Blog Post:</label><br />
+      <textarea id="body" name="body" class="extend" rows="15">
+<%=blogPost.body%></textarea
+      >
+      <br />
+      <input type="submit" value="Publish Update" />
+    </form>
+  </body>
+</html>

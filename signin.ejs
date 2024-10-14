@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Signin Page</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <%- include("header.ejs") %>
+    <h1 class="center">Signin Page</h1>
+    <form action="/" method="post" class="formLayout fullScreen">
+      <label for="username">Username</label><br />
+      <input
+        type="input"
+        id="username"
+        name="username"
+        class="extend"
+        value=""
+      /><br />
+      <label for="password">Password</label><br />
+      <input
+        type="input"
+        id="password"
+        name="password"
+        class="extend"
+        value=""
+      /><br />
+      <input type="submit" value="Sign in" /><br />
+      <input
+        type="submit"
+        value="Sign up for an acount"
+        formmethod="get"
+        formaction="/signup"
+      />
+    </form>
+    <% if(userId == "retry") {%>
+    <p class="center">
+      Username and/or password are incorrect<br />Please try again, or sign up
+    </p>
+    <%}%>
+  </body>
+</html>
