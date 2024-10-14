@@ -36,6 +36,7 @@ app.get("/home", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
+  userId =''
   res.render(__dirname + "/signin.ejs", {
     userId: userId,
   });
@@ -61,6 +62,7 @@ app.get("/signup", (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
+
   if (
     (await signup(req.body.username, req.body.password, req.body.name)) 
   ) {
@@ -131,11 +133,10 @@ async function checkUsernameNotInUse(username) {
 async function signup(username, password, name) {
   if (await checkUsernameNotInUse(username)) {
     try {
-      const result = db.query(
+      const result = await db.query(
         "INSERT INTO users (user_id,password,name) VALUES ($1,$2,$3)",
         [username, password, name]
       );
-
       if (result.rowCount > 0) {
         return true;
       } else {
@@ -170,7 +171,7 @@ async function postBlog(username, title, body) {
     const query =
       "INSERT INTO blogs (creator_name,title,body,creator_user_id)" +
       " SELECT users.name, $1, $2, users.user_id FROM users WHERE users.user_id = $3";
-    const result = db.query(query, [title, body, username]);
+    const result = await db.query(query, [title, body, username]);
     if (result.rowCount > 0) {
       return true;
     } else {
@@ -183,7 +184,7 @@ async function postBlog(username, title, body) {
 
 async function deleteBlog(blog_id) {
   try {
-    const result = db.query("DELETE FROM blogs WHERE blog_id = $1", [
+    const result = await db.query("DELETE FROM blogs WHERE blog_id = $1", [
       parseInt(blog_id),
     ]);
     if (result.rowCount > 0) {
@@ -209,7 +210,7 @@ async function getPostById(blog_id) {
 
 async function editBlog(blog_id, title, body) {
   try {
-    const result = db.query(
+    const result = await db.query(
       "UPDATE blogs SET title = $1, body = $2 WHERE blog_id = $3",
       [title, body, parseInt(blog_id)]
     );
