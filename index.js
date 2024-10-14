@@ -42,30 +42,35 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-  userId = await signin(req.body.username, req.body.password);
-  if (userId == "retry") {
+  if (await signin(req.body.username, req.body.password)) {
+    userId = req.body.username;
+    res.redirect("/home");
+  } else {
+    userId = -1;
     res.render(__dirname + "/signin.ejs", {
       userId: userId,
     });
-  } else {
-    res.redirect("/home");
   }
 });
 
 app.get("/signup", (req, res) => {
+  userId = '';
   res.render(__dirname + "/signup.ejs", {
     userId: userId,
   });
 });
 
 app.post("/signup", async (req, res) => {
-  userId = await signup(req.body.username, req.body.password, req.body.name);
-  if (userId == "inuse") {
+  if (
+    (await signup(req.body.username, req.body.password, req.body.name)) ||
+    req.body.username != ""
+  ) {
+    res.redirect("/");
+  } else {
+    userId = -1;
     res.render(__dirname + "/signup.ejs", {
       userId: userId,
     });
-  } else {
-    res.redirect("/");
   }
 });
 
@@ -127,19 +132,21 @@ async function checkUsernameNotInUse(username) {
 async function signup(username, password, name) {
   if (await checkUsernameNotInUse(username)) {
     try {
-      db.query("INSERT INTO users (user_id,password,name) VALUES ($1,$2,$3)", [
-        username,
-        password,
-        name,
-      ]);
+      const result = db.query(
+        "INSERT INTO users (user_id,password,name) VALUES ($1,$2,$3)",
+        [username, password, name]
+      );
 
-      return username;
+      if (result.rowCount > 0) {
+        return false;
+      } else {
+        return true;
+      }
     } catch (error) {
       console.log("ERROR: data couldn't be added.");
-      return false;
     }
   } else {
-    return "inuse";
+    return false;
   }
 }
 
@@ -150,9 +157,9 @@ async function signin(username, password) {
       [username, password]
     );
     if (result.rowCount > 0) {
-      return username;
+      return true;
     } else {
-      return "retry";
+      return false;
     }
   } catch (err) {
     console.log("ERROR: could not sign in.");
@@ -164,22 +171,30 @@ async function postBlog(username, title, body) {
     const query =
       "INSERT INTO blogs (creator_name,title,body,creator_user_id)" +
       " SELECT users.name, $1, $2, users.user_id FROM users WHERE users.user_id = $3";
-    db.query(query, [title, body, username]);
-    return true;
+    const result = db.query(query, [title, body, username]);
+    if (result.rowCount > 0) {
+      return false;
+    } else {
+      return true;
+    }
   } catch (error) {
     console.log("ERROR: data couldn't be added.");
   }
-  return false;
 }
 
 async function deleteBlog(blog_id) {
   try {
-    db.query("DELETE FROM blogs WHERE blog_id = $1", [parseInt(blog_id)]);
-    return true;
+    const result = db.query("DELETE FROM blogs WHERE blog_id = $1", [
+      parseInt(blog_id),
+    ]);
+    if (result.rowCount > 0) {
+      return false;
+    } else {
+      return true;
+    }
   } catch (error) {
     console.log("ERROR: data couldn't be added.");
   }
-  return false;
 }
 
 async function getPostById(blog_id) {
@@ -195,14 +210,16 @@ async function getPostById(blog_id) {
 
 async function editBlog(blog_id, title, body) {
   try {
-    db.query("UPDATE blogs SET title = $1, body = $2 WHERE blog_id = $3", [
-      title,
-      body,
-      parseInt(blog_id),
-    ]);
-    return true;
+    const result = db.query(
+      "UPDATE blogs SET title = $1, body = $2 WHERE blog_id = $3",
+      [title, body, parseInt(blog_id)]
+    );
+    if (result.rowCount > 0) {
+      return false;
+    } else {
+      return true;
+    }
   } catch (error) {
     console.log("ERROR: data couldn't be added.");
   }
-  return false;
 }
