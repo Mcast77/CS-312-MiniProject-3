@@ -62,8 +62,7 @@ app.get("/signup", (req, res) => {
 
 app.post("/signup", async (req, res) => {
   if (
-    (await signup(req.body.username, req.body.password, req.body.name)) ||
-    req.body.username != ""
+    (await signup(req.body.username, req.body.password, req.body.name)) 
   ) {
     res.redirect("/");
   } else {
@@ -138,9 +137,9 @@ async function signup(username, password, name) {
       );
 
       if (result.rowCount > 0) {
-        return false;
-      } else {
         return true;
+      } else {
+        return false;
       }
     } catch (error) {
       console.log("ERROR: data couldn't be added.");
@@ -173,9 +172,9 @@ async function postBlog(username, title, body) {
       " SELECT users.name, $1, $2, users.user_id FROM users WHERE users.user_id = $3";
     const result = db.query(query, [title, body, username]);
     if (result.rowCount > 0) {
-      return false;
-    } else {
       return true;
+    } else {
+      return false;
     }
   } catch (error) {
     console.log("ERROR: data couldn't be added.");
@@ -188,9 +187,9 @@ async function deleteBlog(blog_id) {
       parseInt(blog_id),
     ]);
     if (result.rowCount > 0) {
-      return false;
-    } else {
       return true;
+    } else {
+      return false;
     }
   } catch (error) {
     console.log("ERROR: data couldn't be added.");
@@ -215,9 +214,9 @@ async function editBlog(blog_id, title, body) {
       [title, body, parseInt(blog_id)]
     );
     if (result.rowCount > 0) {
-      return false;
-    } else {
       return true;
+    } else {
+      return false;
     }
   } catch (error) {
     console.log("ERROR: data couldn't be added.");
